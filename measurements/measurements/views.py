@@ -20,7 +20,7 @@ def check_place(data):
     r = requests.get(settings.PATH_PLA, headers={"Accept":"application/json"})
     places = r.json()
     for place in places:
-        if data["place"] == place["id"]:
+        if data["place"] == place["name"]:
             return True
     return False
 
@@ -53,18 +53,18 @@ def MeasurementsCreate(request):
         data_json = json.loads(data)
         measurement_list = []
         for measurement in data_json:
-                    if check_variable(measurement) == True:
-                        if check_place(measurement) == True:
-                            db_measurement = Measurement()
-                            db_measurement.variable = measurement['variable']
-                            db_measurement.value = measurement['value']
-                            db_measurement.unit = measurement['unit']
-                            db_measurement.place = measurement['place']
-                            measurement_list.append(db_measurement)
-                        else:
-                            return HttpResponse("unsuccessfully created measurement. Place does not exist")
-                    else:
-                        return HttpResponse("unsuccessfully created measurement. Variable does not exist")
-        
+            if check_variable(measurement) == True:
+                if check_place(measurement) == True:
+                    db_measurement = Measurement()
+                    db_measurement.variable = measurement['variable']
+                    db_measurement.value = measurement['value']
+                    db_measurement.unit = measurement['unit']
+                    db_measurement.place = measurement['place']
+                    measurement_list.append(db_measurement)
+                else:
+                    return HttpResponse("unsuccessfully created measurement. Place does not exist")
+            else:
+                return HttpResponse("unsuccessfully created measurement. Variable does not exist")
+
         Measurement.objects.bulk_create(measurement_list)
         return HttpResponse("successfully created measurements")
